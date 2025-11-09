@@ -220,7 +220,7 @@ The service exposes a minimal `/health` endpoint. You can add a `/metrics` endpo
 * CPU load
 * Memory usage
 * Uptime
-* Custom business metrics (events created, venues count)
+* Custom business metrics (events created, venues count, events listed)
 
 ---
 
@@ -236,7 +236,5 @@ The service exposes a minimal `/health` endpoint. You can add a `/metrics` endpo
 
 * Introduce foreign key constraints between `events.venue_id` and `venues.id`.
 * Add pagination, sorting, and richer filters for `GET /v1/events`.
-* Add OpenAPI/Swagger docs (`@nestjs/swagger`) for auto-generated API docs.
-* Add Prometheus metrics and tracing (OpenTelemetry).
 * Add admin UI for managing venues & events.
 * Add migrations (TypeORM or another tool) and CI integration.
