@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # 1️⃣ Database for Catalog Service
+  catalogdb:
+    image: postgres:14-alpine
+    container_name: catalogdb
+    environment:
+      POSTGRES_DB: catalogdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - catalogue-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketing-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2️⃣ Catalog Service itself
+  catalog-service:
+    build:
+      context: .                # assuming your Dockerfile is in root of repo
+      dockerfile: Dockerfile
+    container_name: catalog-service
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: 4001
+      DATABASE_HOST: catalogdb
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: catalogdb
+    depends_on:
+      catalogdb:
+        condition: service_healthy
+    networks:
+      - ticketing-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  catalogue-db-data:
+
+networks:
+  ticketing-network:
+    driver: bridge
